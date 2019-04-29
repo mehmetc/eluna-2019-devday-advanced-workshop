@@ -4,9 +4,14 @@ describe('searchbar-submenu', () => {
   })
 
   describe('submenu', () => {
-    it('exists')
+    it('exists', () => {
+      cy.wait(5000);
+      cy.get('search-bar-sub-menu > .layout-align-end-center').as('subMenu');      
+    })
 
-    it('is visible')
+    it('is visible', () => {
+      cy.get('search-bar-sub-menu > .layout-align-end-center').should('be.visible');      
+    })
 
     describe('has the correct menu items', () => {
       const submenuItems = [
@@ -20,10 +25,23 @@ describe('searchbar-submenu', () => {
         }
       ]
 
-      it(`has ${submenuItems.length} buttons`)
+      it(`has ${submenuItems.length} buttons`, () => {
+        cy.get('.layout-align-end-center > ul > li').should('have.length', submenuItems.length);;
+      })
 
       submenuItems.forEach(({ label, link }, idx) => {
-        it(`has a button with ${label} which opens ${link} when clicked`)
+        it(`has a button with ${label} which opens ${link} when clicked`, () => {
+          cy.window().then(win => () => {
+            const spy = cy.stub(win, 'open');
+
+            cy.get('.layout-align-end-center > ul > li > button')
+            .eq(idx).should('contain', label)
+            .click()
+            .then(() => {
+              expect(spy).to.be.called.with(link);
+            });
+          });
+        })
       })
     })
   })
